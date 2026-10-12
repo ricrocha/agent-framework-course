@@ -4,7 +4,6 @@ using OpenAI.Chat;
 using Samples.SampleUtilities;
 using System.ClientModel;
 using System.Text;
-using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
 namespace Samples.Section04;
 

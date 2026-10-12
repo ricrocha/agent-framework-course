@@ -7,7 +7,6 @@ using OpenAI.Chat;
 using Samples.SampleUtilities;
 using System.ClientModel;
 using System.ClientModel.Primitives;
-using System.ComponentModel;
 using System.Text.Json;
 
 namespace Samples.Section07;

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using OpenAI.Chat;
 using OpenAI.Containers;
 using OpenAI.Responses;
 using Samples.SampleUtilities;

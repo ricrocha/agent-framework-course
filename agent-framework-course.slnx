@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Documentation/">
+    <File Path="Documentation/breaking_changes.png" />
+  </Folder>
+  <Project Path="SampleConsoleApplication/SampleConsoleApplication.csproj" Id="bde6b8e5-0513-42b1-a7ee-889f1a629457" />
   <Project Path="SampleConsoleRunner/SampleConsoleRunner.csproj" Id="0b5381e0-2efb-4bf7-be22-678b73e5ae17" />
   <Project Path="samples/Samples.csproj" />
 </Solution>
