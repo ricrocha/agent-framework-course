@@ -1,7 +1,8 @@
 ﻿using OpenAI.Responses;
 using System.ClientModel;
 using Azure.AI.OpenAI;
-using Microsoft.Agents.AI;using Microsoft.Extensions.Configuration;
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.Configuration;
 using OpenAI;
 using OpenAI.Chat;
 
@@ -24,46 +25,28 @@ string openAiApiKey = configuration["OpenAI:ApiKey"] ?? throw new InvalidOperati
 string azureOpenAiEndPoint = configuration["AzureOpenAI:EndPoint"] ?? throw new InvalidOperationException("AzureOpenAI:EndPoint is not configured.");
 string azureOpenAiApiKey = configuration["AzureOpenAI:ApiKey"] ?? throw new InvalidOperationException("AzureOpenAI:ApiKey is not configured.");
 
-InitializeAzureFoundryClient(azureFoundryApiKey, azureFoundryEndPointWithVersion, deploymentName);
 
-await InitializeOpenAiClient(openAiApiKey, deploymentName);
+/*
+ * Steps:
+ * 1: Create a 'Microsoft Foundry' Resource + Deploy Model
+ * 2: Add Nuget Packages (Microsoft.Agents.AI.OpenAi)
+ * 3: Create an OpenAiClient with Endpoint (API Key or Azure Identity)
+ * 4: Get a GetResponsesClient and Create and AI Agent from it (model is mandatory)
+ * 5: Call RunAsync or RunStreamingAsync
+ */
 
-await InitializeAzureOpenAiClient(azureOpenAiEndPoint, azureOpenAiApiKey, deploymentName);
+/*
+ * Steps:
+ * 1: Create a 'Microsoft Foundry' Resource + Deploy Model
+ * 2: Add Nuget Packages (Microsoft.Agents.AI.Foundry)
+ * 3: Create an AIProjectClient with Endpoint and AzureCli
+ * 4: Create an AI Agent from the client (instructions _ model are mandatory)
+ * 5: Call RunAsync or RunStreamingAsync
+ */
 
-async Task InitializeOpenAiClient(string openAiApiKey, string deploymentName1)
-{
-    // OpenAI Client
-    Console.WriteLine("Starting the OpenAi client...");
-    Console.WriteLine("--OpenAi--");
-
-    OpenAIClient openAiClient = new OpenAIClient(openAiApiKey);
-
-    ChatClientAgent openAiAgent = openAiClient.GetChatClient(deploymentName1).AsAIAgent();
-
-    AgentResponse openAiResponse = await openAiAgent.RunAsync("What is the capital of France?");
-
-    Console.WriteLine(openAiResponse);
-
-    Console.ReadLine();
-}
-
-async Task InitializeAzureOpenAiClient(string azureOpenAiEndPoint, string azureOpenAiApiKey1, string s1)
-{
-    // AzureOpenAI
-
-    Console.WriteLine("Starting the AzureOpenAi client...");
-    Console.WriteLine("--AzureOpenAi--");
-
-    AzureOpenAIClient azureFoundryClient = new AzureOpenAIClient(new Uri(azureOpenAiEndPoint), new ApiKeyCredential(azureOpenAiApiKey1));  
-
-    ChatClientAgent azureFoundryAgent = azureFoundryClient.GetChatClient(s1).AsAIAgent();
-
-    AgentResponse azureFondryAgentResponse = await azureFoundryAgent.RunAsync("What is the capital of France?");
-
-    Console.WriteLine(azureFondryAgentResponse);
-
-    Console.ReadLine();
-}
+//InitializeAzureFoundryClient(azureFoundryApiKey, azureFoundryEndPointWithVersion, deploymentName);
+//await InitializeOpenAiClient(openAiApiKey, deploymentName);
+//await InitializeAzureOpenAiClient(azureOpenAiEndPoint, azureOpenAiApiKey, deploymentName);
 
 void InitializeAzureFoundryClient(string azureFoundryApiKey, string azureFoundryEndPointWithVersion1, string deploymentName2)
 {
@@ -79,7 +62,7 @@ void InitializeAzureFoundryClient(string azureFoundryApiKey, string azureFoundry
         Model = deploymentName2,   // "gpt-4.1-nano"
         InputItems =
         {
-            ResponseItem.CreateUserMessageItem("What's the weather like today for Stamford, Connecticut?"),
+            ResponseItem.CreateUserMessageItem("What is the capital of France?"),
         },
     };
 
@@ -89,3 +72,49 @@ void InitializeAzureFoundryClient(string azureFoundryApiKey, string azureFoundry
 
     Console.ReadLine();
 }
+
+async Task InitializeOpenAiClient(string openAiApiKey, string deploymentName1)
+{
+    // OpenAI Client
+    Console.WriteLine("Starting the OpenAi client...");
+    Console.WriteLine("--OpenAi--");
+
+    OpenAIClient openAiClient = new OpenAIClient(openAiApiKey);
+
+    ChatClientAgent openAiAgent = openAiClient.GetChatClient(deploymentName1).AsAIAgent();
+
+    AgentResponse openAiResponse = await openAiAgent.RunAsync("What is the capital of France?");
+
+    Console.WriteLine(openAiResponse);
+
+     await foreach(AgentResponseUpdate update in openAiAgent.RunStreamingAsync("How to make soup?"))
+     {
+         Console.Write(update);
+     }
+
+    Console.ReadLine();
+}
+
+async Task InitializeAzureOpenAiClient(string azureOpenAiEndPoint, string azureOpenAiApiKey, string deploymentName)
+{
+    // AzureOpenAI
+
+    Console.WriteLine("Starting the AzureOpenAi client...");
+    Console.WriteLine("--AzureOpenAi--");
+
+    AzureOpenAIClient azureOpenAiClient = new AzureOpenAIClient(new Uri(azureOpenAiEndPoint), new ApiKeyCredential(azureOpenAiApiKey));  
+
+    ChatClientAgent azureOpenAiAgent = azureOpenAiClient.GetChatClient(deploymentName).AsAIAgent();
+
+    AgentResponse azureOpenAiAgentResponse = await azureOpenAiAgent.RunAsync("What is the capital of France?");
+
+    Console.WriteLine(azureOpenAiAgentResponse);
+
+    await foreach (AgentResponseUpdate update in azureOpenAiAgent.RunStreamingAsync("How to make soup?"))
+    {
+        Console.Write(update);
+    }
+
+    Console.ReadLine();
+}
+
